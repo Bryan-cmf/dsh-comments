@@ -98,6 +98,7 @@ const mark = {
 	occ: 0, type: 'disagree', comment: '我不同意，B 更穩', created: 1,
 }
 global.window.localStorage.setItem('dsh-markup/marks/v1', JSON.stringify({ 'sess-1': [mark] }))
+T.reseed()
 out = render(MarkupDock, { sessionId: 'sess-1', input: { draft: '' }, inputActions: { setDraft: () => {}, submit: () => {} } })
 assert(out !== null && out.type === 'div', 'dock renders with marks')
 const texts = []

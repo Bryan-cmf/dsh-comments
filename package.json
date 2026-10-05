@@ -1,6 +1,6 @@
 {
   "name": "dsh-markup",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "Markup for DeepSeek Harness:劃選助手回覆的任意片段 → 選點評類型 + 寫意見 → 高亮標記,一鍵把全部點評組裝成「引用 + 意見」的結構化消息插入輸入框或直接發送。",
   "license": "MIT",
   "type": "module",

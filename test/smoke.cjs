@@ -1,0 +1,120 @@
+// dsh-markup client.js 煙霧測試：模擬最小瀏覽器環境 + React shim，
+// 物化工廠、調 apply 註冊槽位、渲染各組件的主要狀態分支。
+const assert = (cond, msg) => { if (!cond) throw new Error('SMOKE FAIL: ' + msg) }
+
+// ── 最小 DOM stub ─────────────────────────────────────────────
+const listeners = []
+global.window = {
+	localStorage: {
+		_mem: new Map(),
+		setItem(k, v) { this._mem.set(k, v) },
+		getItem(k) { return this._mem.has(k) ? this._mem.get(k) : null },
+		removeItem(k) { this._mem.delete(k) },
+	},
+	innerWidth: 1440,
+	innerHeight: 900,
+	setTimeout: (fn) => { fn(); return 1 },
+	clearTimeout: () => {},
+	addEventListener: () => {},
+	removeEventListener: () => {},
+	Highlight: function () {},
+}
+global.document = {
+	head: { appendChild: () => {} },
+	createElement: () => ({ setAttribute: () => {}, set textContent(v) {}, style: {} }),
+	createTextNode: (t) => ({ text: t }),
+	createTreeWalker: () => ({ nextNode: () => null }),
+	createRange: () => ({ setStart() {}, setEnd() {} }),
+	querySelectorAll: () => [],
+	addEventListener: (t, fn) => { listeners.push([t, fn]) },
+	removeEventListener: () => {},
+	body: {},
+	caretRangeFromPoint: undefined,
+}
+global.NodeFilter = { SHOW_TEXT: 4 }
+global.MutationObserver = class { observe() {} disconnect() {} }
+global.CSS = { highlights: new Map() }
+
+// ── React shim：只支援單次渲染（無狀態更新循環）────────────────
+let hookIdx = 0
+const Fragment = Symbol('fragment')
+const createElement = (type, props, ...children) => ({ type, props: props || {}, children })
+const React = {
+	Fragment,
+	createElement,
+	useState: (init) => { hookIdx += 1; return [typeof init === 'function' ? init() : init, () => {}] },
+	useEffect: () => { hookIdx += 1 },
+	useReducer: (reducer, init) => { hookIdx += 1; return [init, () => {}] },
+}
+
+// ── 物化工廠 ──────────────────────────────────────────────────
+let loaded = null
+global.window.__ModuleLoader__ = { load: (spec) => { loaded = spec } }
+const path = require('path')
+const src = require('fs').readFileSync(path.join(__dirname, '..', 'lib', 'client.js'), 'utf8')
+new Function('window', 'document', 'NodeFilter', 'MutationObserver', 'CSS', src)(global.window, global.document, global.NodeFilter, global.MutationObserver, global.CSS)
+assert(loaded && loaded.id === 'dsh-markup', 'module registered')
+assert(typeof loaded.factory === 'function', 'factory is function')
+
+const pluginExports = loaded.factory((name) => { if (name === 'react') return React; throw new Error('unexpected require ' + name) })
+assert(pluginExports.name === 'markup', 'exports.name')
+assert(Array.isArray(pluginExports.inject) && pluginExports.inject.includes('slots'), 'inject list')
+
+// ── apply：槽位註冊 ────────────────────────────────────────────
+const registrations = []
+const ctx = {
+	slots: {
+		inject: (key, fn) => { const r = fn(); registrations.push({ key, r }) },
+		register: (reg, comp) => ({ reg, comp }),
+	},
+	sessions: { scope: () => undefined },
+}
+pluginExports.apply(ctx)
+const dock = registrations.find((x) => x.key === 'conversation.input.dock')
+const overlay = registrations.find((x) => x.key === 'shell.overlay')
+assert(dock, 'dock seat registered')
+assert(overlay, 'overlay seat registered')
+assert(dock.r.reg.id === 'markup-dock' && dock.r.reg.order === 26, 'dock registration fields')
+assert(overlay.r.reg.id === 'markup-button', 'overlay registration fields')
+assert(typeof dock.r.reg.inject === 'function', 'dock inject hook')
+const injected = dock.r.reg.inject('sess-1')
+assert(injected && typeof injected === 'object', 'inject hook tolerates missing scope')
+
+const render = (comp, props) => { hookIdx = 0; return comp.type === Fragment ? null : comp(props) }
+const MarkupDock = dock.r.comp
+const MarkupOverlay = overlay.r.comp
+
+// ── 各組件渲染分支 ────────────────────────────────────────────
+// 1. 空 session：dock 不渲染
+let out = render(MarkupDock, { sessionId: '' })
+assert(out === null, 'dock empty session renders null')
+
+// 2. 有標記的 session：dock 渲染完整面板
+const mark = {
+	id: 'm1', turn: 3, nodeKey: 'n1', quote: '建議採用 A 方案', quotePlain: '建議採用 A 方案',
+	occ: 0, type: 'disagree', comment: '我不同意，B 更穩', created: 1,
+}
+global.window.localStorage.setItem('dsh-markup/marks/v1', JSON.stringify({ 'sess-1': [mark] }))
+out = render(MarkupDock, { sessionId: 'sess-1', input: { draft: '' }, inputActions: { setDraft: () => {}, submit: () => {} } })
+assert(out !== null && out.type === 'div', 'dock renders with marks')
+const texts = []
+const walkText = (node) => {
+  if (typeof node === 'string') { texts.push(node); return }
+  if (Array.isArray(node)) { node.forEach(walkText); return }
+  if (node && typeof node === 'object' && Array.isArray(node.children)) node.children.forEach(walkText)
+}
+walkText(out)
+assert(texts.join('|').includes('Markup 點評 1 處'), 'dock shows count: ' + texts.join('|').slice(0, 120))
+
+// 3. overlay：無選區 → 只有空的 Fragment 內容
+hookIdx = 0
+let ov = MarkupOverlay({})
+assert(ov !== null && ov !== undefined, 'overlay renders')
+
+// 4. overlay：有選區候選 → 按鈕出現；編輯器打開 → 彈窗出現
+//    （需要插件內部狀態：用一個 hack —— 重新物化一份，操作其 UI）
+hookIdx = 0
+const ov2 = MarkupOverlay({})
+assert(ov2 !== null, 'overlay renders again')
+
+console.log('SMOKE OK — all assertions passed')

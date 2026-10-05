@@ -1,0 +1,10 @@
+# dsh-markup — bundle patch layer.
+#
+# Inserted when this package is listed in a profile's `dsh.profile.bundles`.
+# The host half publishes no Service and injects nothing, so it sits loose.
+# Its real job is to be a Loader entry: `dsh-client-modules` scans every live
+# entry's `dsh.client` declaration, so this row is what registers the browser
+# half (lib/client.js) into window.__DSH_BOOT__ and the /plugins route.
+- insert:
+    - id: markup
+      name: 'dsh-markup'

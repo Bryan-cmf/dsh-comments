@@ -1,0 +1,39 @@
+{
+  "name": "dsh-markup",
+  "version": "0.1.0",
+  "description": "Markup for DeepSeek Harness:劃選助手回覆的任意片段 → 選點評類型 + 寫意見 → 高亮標記,一鍵把全部點評組裝成「引用 + 意見」的結構化消息插入輸入框或直接發送。",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.js",
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "cordis",
+    "cordis-plugin",
+    "dsh-plugin",
+    "markup",
+    "annotation",
+    "review"
+  ],
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-modules"
+      ]
+    }
+  }
+}

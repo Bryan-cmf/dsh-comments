@@ -108,7 +108,7 @@ const walkText = (node) => {
   if (node && typeof node === 'object' && Array.isArray(node.children)) node.children.forEach(walkText)
 }
 walkText(out)
-assert(texts.join('|').includes('Markup 點評 1 處'), 'dock shows count: ' + texts.join('|').slice(0, 120))
+assert(texts.join('|').includes('1 處待發'), 'dock shows count: ' + texts.join('|').slice(0, 120))
 
 // 3. overlay：無選區 → 只有空的 Fragment 內容
 hookIdx = 0

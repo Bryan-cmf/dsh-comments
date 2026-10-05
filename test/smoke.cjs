@@ -57,6 +57,7 @@ assert(loaded && loaded.id === 'dsh-markup', 'module registered')
 assert(typeof loaded.factory === 'function', 'factory is function')
 
 const pluginExports = loaded.factory((name) => { if (name === 'react') return React; throw new Error('unexpected require ' + name) })
+const T = pluginExports.__test
 assert(pluginExports.name === 'markup', 'exports.name')
 assert(Array.isArray(pluginExports.inject) && pluginExports.inject.includes('slots'), 'inject list')
 
@@ -111,10 +112,38 @@ hookIdx = 0
 let ov = MarkupOverlay({})
 assert(ov !== null && ov !== undefined, 'overlay renders')
 
-// 4. overlay：有選區候選 → 按鈕出現；編輯器打開 → 彈窗出現
-//    （需要插件內部狀態：用一個 hack —— 重新物化一份，操作其 UI）
+// 4. overlay：再次渲染
 hookIdx = 0
 const ov2 = MarkupOverlay({})
 assert(ov2 !== null, 'overlay renders again')
+
+// 5. 編輯面板（edit 模式）：側欄定位、可拖動頭、保存按鈕都渲染出來
+T.setEditorState({ mode: 'edit', markId: mark.id, draft: { turn: 3, quote: '引用文字', quotePlain: '引用文字', occ: 0, x: 0, y: 0 }, type: 'suggest', comment: '意見', x: 0, y: 0 })
+hookIdx = 0
+const ov3 = MarkupOverlay({})
+const texts3 = []
+const walk3 = (node) => {
+  if (typeof node === 'string') { texts3.push(node); return }
+  if (Array.isArray(node)) { node.forEach(walk3); return }
+  if (node && typeof node === 'object' && typeof node.type === 'function') { walk3(node.type(node.props || {})); return }
+  if (node && typeof node === 'object' && Array.isArray(node.children)) node.children.forEach(walk3)
+}
+walk3(ov3)
+const joined = texts3.join('|')
+assert(joined.includes('可拖動'), 'editor has drag hint')
+assert(joined.includes('保存標記'), 'editor has save button')
+assert(joined.includes('建議修改'), 'editor has type chips')
+// 面板根節點樣式：固定定位 + 344 寬
+let panelNode = null
+const findPanel = (node) => {
+  if (node && typeof node === 'object' && typeof node.type === 'function') { findPanel(node.type(node.props || {})); return }
+  if (node && typeof node === 'object' && node.type === 'div' && node.props && node.props.style && node.props.style.width === 344) panelNode = node
+  if (node && typeof node === 'object' && Array.isArray(node.children)) node.children.forEach(findPanel)
+  if (Array.isArray(node)) node.forEach(findPanel)
+}
+findPanel(ov3)
+assert(panelNode !== null, 'editor panel node found')
+assert(panelNode.props.style.position === 'fixed', 'editor panel fixed')
+assert(typeof panelNode.props.ref === 'function', 'editor panel has drag ref')
 
 console.log('SMOKE OK — all assertions passed')

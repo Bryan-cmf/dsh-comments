@@ -193,4 +193,29 @@ assert(hay === 'Alpha beta gamma delta.Alpha beta second occurrence.', 'haystack
 	assert(T.locateMarkRange(mark) === null, 's6 missing turn')
 }
 
-console.log('ANCHOR OK — 6 scenarios passed')
+// ── 場景 7：quotePlain 空白與 DOM 不一致 → 正規化後備匹配 ────
+{
+	const mark = { turn: 3, quotePlain: 'Alpha  beta\t gamma', occ: 0 } // 多餘空白
+	const located = T.locateMarkRange(mark)
+	assert(located !== null, 's7 normalized located')
+	assert(located.startContainer === t1 && located.startOffset === 0, 's7 start')
+	// 涵蓋 'Alpha beta gamma'（t1 全部 + t2 開頭）
+	assert(located.endContainer === t2, 's7 end in t2')
+}
+
+// ── 場景 8：DOM 重渲染後空白加倍 → 正規化後備匹配 ────────────
+{
+	// 把 t1 的文字節點值加空白差異，精確匹配應失敗但正規化應命中
+	const saved = t1.nodeValue
+	t1.nodeValue = 'Alpha  beta '
+	try {
+		const mark = { turn: 3, quotePlain: 'Alpha beta gamma', occ: 0 }
+		const located = T.locateMarkRange(mark)
+		assert(located !== null, 's8 hay-normalized located')
+		assert(located.startContainer === t1 && located.startOffset === 0, 's8 start')
+	} finally {
+		t1.nodeValue = saved
+	}
+}
+
+console.log('ANCHOR OK — 8 scenarios passed')

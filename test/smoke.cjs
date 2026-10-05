@@ -14,6 +14,8 @@ global.window = {
 	innerWidth: 1440,
 	innerHeight: 900,
 	setTimeout: (fn) => { fn(); return 1 },
+	setInterval: () => 1,
+	clearInterval: () => {},
 	clearTimeout: () => {},
 	addEventListener: () => {},
 	removeEventListener: () => {},

@@ -146,4 +146,9 @@ assert(panelNode !== null, 'editor panel node found')
 assert(panelNode.props.style.position === 'fixed', 'editor panel fixed')
 assert(typeof panelNode.props.ref === 'function', 'editor panel has drag ref')
 
+// 6. 組裝消息格式：塊間空行分隔、無 ** 裝飾（修 md 惰性續行渲染問題）
+const msg = T.composeMessage([{ turn: 3, quote: '引用一\n引用二', type: 'disagree', comment: '意見一' }])
+assert(msg.includes('\n\n> 引用一\n> 引用二\n\n意見：意見一'), 'compose blank-line separated, got: ' + JSON.stringify(msg))
+assert(!msg.includes('**'), 'compose has no bold decoration')
+
 console.log('SMOKE OK — all assertions passed')

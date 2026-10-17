@@ -1,4 +1,4 @@
-# dsh-markup — bundle patch layer.
+# dsh-comments — bundle patch layer.
 #
 # Inserted when this package is listed in a profile's `dsh.profile.bundles`.
 # The host half publishes no Service and injects nothing, so it sits loose.
@@ -7,4 +7,4 @@
 # half (lib/client.js) into window.__DSH_BOOT__ and the /plugins route.
 - insert:
     - id: markup
-      name: 'dsh-markup'
+      name: 'dsh-comments'

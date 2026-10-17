@@ -1,4 +1,4 @@
-# dsh-markup — 劃選點評插件
+# dsh-comments — 劃選點評插件
 
 在 DSH 對話裏，用鼠標劃選助手回覆的**任意小段文字**，逐段點評：
 選類型 → 寫意見 → 高亮標記。點評集中在一條結構化消息裏（引用 + 類型 +
@@ -69,7 +69,7 @@
 
 已列於 profile 的 `dsh.profile.bundles`（經 plugin_manager 安裝）。
 卸載：Plugins 設置頁移除 bundle，或從 profile `package.json` 的
-`dsh.profile.bundles` 刪去 `dsh-markup` 後重啟。
+`dsh.profile.bundles` 刪去 `dsh-comments` 後重啟。
 
 ## 開發
 

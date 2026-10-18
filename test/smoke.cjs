@@ -55,12 +55,12 @@ global.window.__ModuleLoader__ = { load: (spec) => { loaded = spec } }
 const path = require('path')
 const src = require('fs').readFileSync(path.join(__dirname, '..', 'lib', 'client.js'), 'utf8')
 new Function('window', 'document', 'NodeFilter', 'MutationObserver', 'CSS', src)(global.window, global.document, global.NodeFilter, global.MutationObserver, global.CSS)
-assert(loaded && loaded.id === 'dsh-markup', 'module registered')
+assert(loaded && loaded.id === 'dsh-comments', 'module registered')
 assert(typeof loaded.factory === 'function', 'factory is function')
 
 const pluginExports = loaded.factory((name) => { if (name === 'react') return React; throw new Error('unexpected require ' + name) })
 const T = pluginExports.__test
-assert(pluginExports.name === 'markup', 'exports.name')
+assert(pluginExports.name === 'comments', 'exports.name')
 assert(Array.isArray(pluginExports.inject) && pluginExports.inject.includes('slots'), 'inject list')
 
 // ── apply：槽位註冊 ────────────────────────────────────────────
@@ -135,7 +135,7 @@ walk3(ov3)
 const joined = texts3.join('|')
 assert(joined.includes('可拖動'), 'editor has drag hint')
 assert(joined.includes('保存標記'), 'editor has save button')
-assert(joined.includes('建議修改'), 'editor has type chips')
+assert(joined.includes('指示') && joined.includes('評論'), 'editor has type chips')
 // 面板根節點樣式：固定定位 + 344 寬
 let panelNode = null
 const findPanel = (node) => {

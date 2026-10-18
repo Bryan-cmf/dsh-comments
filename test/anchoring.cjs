@@ -1,4 +1,4 @@
-// dsh-markup 錨定回歸測試：用假 DOM（屬性選擇器 + TreeWalker + Range 坐標語義）
+// dsh-comments 錨定回歸測試：用假 DOM（屬性選擇器 + TreeWalker + Range 坐標語義）
 // 驗證「選區 → (turn, 文本, 出現序號) → 重定位 Range」全鏈路，包括嵌套
 // wrapper 去重、跨節點選區、同文本多次出現、occ 越界收斂到最後一次。
 const assert = (cond, msg) => { if (!cond) throw new Error('ANCHOR FAIL: ' + msg) }

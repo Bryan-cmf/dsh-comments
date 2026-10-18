@@ -6,5 +6,5 @@
 # entry's `dsh.client` declaration, so this row is what registers the browser
 # half (lib/client.js) into window.__DSH_BOOT__ and the /plugins route.
 - insert:
-    - id: markup
+    - id: comments
       name: 'dsh-comments'

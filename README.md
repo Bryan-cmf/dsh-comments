@@ -7,7 +7,7 @@
 
 ## 使用流程
 
-1. 在任意一條助手消息上劃選一小段文字（鬆開鼠標後）→ 選區末端浮出 **✎ Markup** 按鈕。
+1. 在任意一條助手消息上劃選一小段文字（鬆開鼠標後）→ 選區末端浮出 **✎ Comments** 按鈕。
 2. 點擊 → **右側邊欄式編輯面板**（不遮正文；標題欄可拖動，位置記憶）：
    先選**點評類型**（不同意 / 不清晰 / 建議修改 / 提問 / 其他），再填
    **意見**（必填）。引用精確等於你所選的文字（表格儲存格以 `|` 分隔）。
@@ -16,7 +16,7 @@
 4. **側邊導航軌**（右緣細軌，Word 式頁邊標記）：每條點評一枚彩色刻度，
    位置對應其在對話滾動內容中的相對位置——懸停彈出**邊注卡**（類型 /
    第幾輪 / 引用摘要 / 意見，可定位、可編輯），點擊滾動到原文並閃爍。
-4. composer 上方出現 **🏷 Markup 點評 N 處** 面板：
+4. composer 上方出現 **🏷 Comments 點評 N 處** 面板：
    - 展開可查看每條點評（類型 / 第幾輪 / 引用摘要 / 意見）；
    - 每條可 **定位**（滾動到原文並閃爍）、**✎ 編輯**、**✕ 刪除**；
    - **⤴ 插入輸入框**：把全部點評組裝成編號引用消息追加到草稿；
@@ -40,7 +40,7 @@
 
 意見：「壓縮」具體丟掉哪些內容沒說清楚……
 
-（以上由 Markup 劃選點評生成；請先確認你對每一處引用的理解，再逐條回應……）
+（以上由 Comments 劃選點評生成；請先確認你對每一處引用的理解，再逐條回應……）
 ```
 
 > 模板規範（v0.2.1）：所有塊之間空行分隔——避免 markdown 惰性續行把
@@ -60,8 +60,8 @@
   entry inject hook 走 `conversation.input.for(actx)` 服務路由（官方
   queue dock 同款），`props.inputActions`（provide 通道）為後備；兩者
   都不可用時退化为複製到剪貼板。
-- **席位**：`shell.overlay`（id `markup-button`，劃選按鈕 + 編輯彈窗）、
-  `conversation.input.dock`（id `markup-dock`，order 26，點評面板）。
+- **席位**：`shell.overlay`（id `comments-button`，劃選按鈕 + 編輯彈窗）、
+  `conversation.input.dock`（id `comments-dock`，order 26，點評面板）。
   Host 半慣性（`dsh.client` 聲明即讓 `dsh-client-modules` 服務 client bundle）。
 - 與 dsh-insights 的「加到筆記」選區按鈕**共存**：本插件按鈕錨在選區右端。
 
@@ -74,4 +74,4 @@
 ## 開發
 
 純手寫 client bundle（無構建步驟）：改 `lib/client.js` → 重啟（或 HMR）
-→ 刷新頁面。localStorage 鍵：`dsh-markup/marks/v1`。
+→ 刷新頁面。localStorage 鍵：`dsh-comments/marks/v1`（舊鍵 `dsh-markup/marks/v1` 會自動搬移）。

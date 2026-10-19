@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.6.1
+
+- **Phones keep icons, not words.** Under 520px the dock's status row hides its
+  text: the toggle shows 🏷, the host-sync state shows ☁ / ⚠ / …, the insert
+  action shows ⤴ and the send action shows ➤. Each control keeps its tooltip.
+  The labels are ordinary spans with compact classes, so the media query only
+  hides them; nothing is removed from the DOM.
+
 ## 0.6.0
 
 Full rename to `dsh-comments`. Nothing a user presses changes name, but every

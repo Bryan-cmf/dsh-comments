@@ -22,8 +22,15 @@ global.window = {
 	Highlight: function () {},
 }
 global.document = {
-	head: { appendChild: () => {} },
-	createElement: () => ({ setAttribute: () => {}, set textContent(v) {}, style: {} }),
+	head: { children: [], appendChild(node) { this.children.push(node) } },
+	createElement: (tag) => ({
+		tagName: String(tag).toUpperCase(),
+		attributes: {},
+		setAttribute(key, value) { this.attributes[key] = value },
+		set textContent(value) { this.text = value },
+		get textContent() { return this.text ?? '' },
+		style: {},
+	}),
 	createTextNode: (t) => ({ text: t }),
 	createTreeWalker: () => ({ nextNode: () => null }),
 	createRange: () => ({ setStart() {}, setEnd() {} }),
@@ -97,6 +104,10 @@ let out = render(CommentsDock, { sessionId: '' })
 assert(out === null, 'dock empty session renders null')
 
 // 2. 有標記的 session：dock 渲染完整面板
+// 窄螢幕：狀態列的文字都掛了 compact class（由 520px 媒體查詢收起）
+assert(global.document.head.children.some((node) => String(node.textContent || '').includes('dsh-comments-count')), 'compact classes are in the stylesheet')
+assert(global.document.head.children.some((node) => String(node.textContent || '').includes('max-width: 520px')), 'the mobile media query is present')
+
 const mark = {
 	id: 'm1', turn: 3, nodeKey: 'n1', quote: '建議採用 A 方案', quotePlain: '建議採用 A 方案',
 	occ: 0, type: 'disagree', comment: '我不同意，B 更穩', created: 1,
